@@ -23,32 +23,25 @@ fun hw2(inputFilePath: String, outputFilePath: String) {
             val assumptions = strInit.mapIndexed { index, s -> Pair(parseExpr(s), index + 1) }.toMap()
 
             val approvedList: MutableList<Expr> = ArrayList()
-            val approvedListAtLine: MutableMap<Expr, Int> = HashMap()
-            var lineNumber = 1
+            val approved: MutableSet<Expr> = HashSet()
+
             input.forEachLine { line ->
                 val expr = parseExpr(line)
 
-                val newLines = deductionStep(expr, lineNumber, lastAssumption, assumptions, approvedList, approvedListAtLine)
+                val newLines = deductionStep(expr, lastAssumption, assumptions, approvedList, approved)
                 newLines.forEach { exprOfModifiedLine ->
                     output.write(exprOfModifiedLine.toString())
                     output.newLine()
                 }
-
-                lineNumber++
-            }
-            approvedList.forEach {
-                println(it)
             }
         }
     }
 }
 
-fun deductionStep(expr: Expr, lineNumber: Int,
-                  lastAssumption: Expr, assumptions: Map<Expr, Int>,
-                  approvedList: MutableList<Expr>,
-                  approvedListAtLine: MutableMap<Expr, Int>): List<Expr> {
+fun deductionStep(expr: Expr, lastAssumption: Expr, assumptions: Map<Expr, Int>,
+                  approvedList: MutableList<Expr>, approvedListAtLine: MutableSet<Expr>): List<Expr> {
     fun addAnnotaion() {
-        approvedListAtLine.put(expr, lineNumber)
+        approvedListAtLine.add(expr)
         approvedList.add(expr)
     }
 
@@ -79,7 +72,7 @@ fun deductionStep(expr: Expr, lineNumber: Int,
     // Проверка на ModusPonens
     approvedList.reversed().forEach { proved ->
         val cur = Impl(proved, expr)
-        if (approvedListAtLine.containsKey(cur)) {
+        if (approvedListAtLine.contains(cur)) {
             val first = Impl(lastAssumption, proved)
             val second = Impl(lastAssumption, cur)
             val third = Impl(lastAssumption, expr)
