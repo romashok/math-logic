@@ -11,8 +11,6 @@ class Hw1KtTest {
     fun good1() {
         val input = "$root/good1.in"
         val output = "$root/good1.out"
-        println(input)
-        println(output)
         hw1(input, output)
         assertTrue(File(output).bufferedReader().lines().allMatch { line -> !line.contains("Не доказано") })
     }

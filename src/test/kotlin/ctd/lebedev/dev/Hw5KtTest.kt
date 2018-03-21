@@ -15,7 +15,6 @@ class Hw5KtTest {
         val output = "$root/output.out"
 
         File(cases).bufferedReader().readLines().filter { it.isNotEmpty() }.forEach { line ->
-            println("l: $line")
             File(input).bufferedWriter().use { out -> out.write(line) }
             hw5(input, output)
 
