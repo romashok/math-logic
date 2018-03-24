@@ -138,7 +138,8 @@ fun freeSubtract(template: Expr, expr: Expr, param: Var, locked: MutableMap<Stri
                     // todo check type of expr
                     return false
                 }
-                val result = freeSubtract(template.param, (expr as All).expr.single(), param, locked, dict)
+//                val result = freeSubtract(template.param, (expr as All).expr.single(), param, locked, dict)
+                val result = freeSubtract(template.expr.single(), (expr as All).expr.single(), param, locked, dict)
                 if (cnt == 0) locked.remove(template.param.value) else locked.put(template.param.value, cnt)
                 return result
             }
@@ -153,6 +154,13 @@ fun freeSubtract(template: Expr, expr: Expr, param: Var, locked: MutableMap<Stri
                 val result = freeSubtract(template.param, (expr as Exists).expr.single(), param, locked, dict)
                 if (cnt == 0) locked.remove(template.param.value) else locked.put(template.param.value, cnt)
                 return result
+            }
+            is Pred -> {
+                if (template.expr.size != (expr as Pred).expr.size) return false
+                for (i in 0 until template.expr.size) {
+                    if (!freeSubtract(template.expr[i], expr.expr[i], param, locked, dict)) return false
+                }
+                return true
             }
             is UnaryExpr -> return freeSubtract(template.expr.single(), (expr as UnaryExpr).expr.single(), param, locked, dict)
             is BinaryExpr -> return freeSubtract(template.l, (expr as BinaryExpr).l, param, locked, dict)

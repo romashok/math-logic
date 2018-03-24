@@ -4,7 +4,7 @@ sealed class Expr {
     abstract fun eval(vars: MutableMap<String, Boolean>): Boolean
 }
 
-sealed class UnaryExpr(vararg var expr: Expr) : Expr() {
+sealed class UnaryExpr(var expr: MutableList<Expr>) : Expr() {
     override fun equals(other: Any?): Boolean {
         if (other is UnaryExpr) {
             return expr.size == other.expr.size &&
@@ -47,8 +47,8 @@ class And(l: Expr, r: Expr) : BinaryExpr(l, r) {
     override fun eval(vars: MutableMap<String, Boolean>) = l.eval(vars) && r.eval(vars)
 }
 
-class Not(expr: Expr) : UnaryExpr(expr) {
-    override fun toString() = if (expr.size == 1) "(!${expr.single()})" else "(!${expr.contentDeepToString()})"
+class Not(expr: Expr) : UnaryExpr(mutableListOf(expr)) {
+    override fun toString() = if (expr.size == 1) "(!${expr.single()})" else "(!${expr.joinToString(",")})"
     override fun eval(vars: MutableMap<String, Boolean>) = !expr.first().eval(vars)
 }
 
@@ -65,13 +65,13 @@ class Var(var value: String) : Expr() {
     }
 }
 
-open class All(var param: Var, expr: Expr) : UnaryExpr(expr) {
+open class All(var param: Var, expr: Expr) : UnaryExpr(mutableListOf(expr)) {
     override fun toString() = "(@$param${expr.joinToString(",")})"
 
     override fun eval(vars: MutableMap<String, Boolean>) = TODO("eval All")
 }
 
-open class Exists(var param: Var, expr: Expr) : UnaryExpr(expr) {
+open class Exists(var param: Var, expr: Expr) : UnaryExpr(mutableListOf(expr)) {
     override fun toString() = "(?$param${expr.joinToString(",")})"
 
 
@@ -79,7 +79,7 @@ open class Exists(var param: Var, expr: Expr) : UnaryExpr(expr) {
 }
 
 
-class Pred(var name: String, vararg values: Expr) : UnaryExpr(*values) {
+class Pred(var name: String, values: MutableList<Expr>) : UnaryExpr(values) {
     override fun toString() = if (expr.isEmpty()) name else "$name(${expr.joinToString(",")})"
 
     override fun eval(vars: MutableMap<String, Boolean>) = TODO("eval Pred")
@@ -106,8 +106,8 @@ class Mul(l: Expr, r: Expr) : BinaryExpr(l, r) {
 }
 
 
-class Next(var value: Expr) : Expr() {
-    override fun toString() = "$value'"
+class Next(value: Expr) : UnaryExpr(mutableListOf(value)) {
+    override fun toString() = "${expr.single()}'"
 
     override fun eval(vars: MutableMap<String, Boolean>) = TODO("eval Mul")
 }

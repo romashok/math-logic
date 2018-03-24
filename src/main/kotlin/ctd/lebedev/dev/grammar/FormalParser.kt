@@ -96,7 +96,7 @@ class FormalParser() {
         val word = readPredName()
         if (word.isNotEmpty()) {
             val args = parseArgs()
-            return Pred(word, *args.toTypedArray())
+            return Pred(word, args)
         } else {
             val save = index
             val result = parseTerm()
@@ -155,7 +155,7 @@ class FormalParser() {
         val word = readVarName()
         if (index < string.length && string[index] == '(') {
             val values = parseArgs()
-            result = Pred(word, *values.toTypedArray())
+            result = Pred(word, values)
         } else {
             result = Var(word)
         }

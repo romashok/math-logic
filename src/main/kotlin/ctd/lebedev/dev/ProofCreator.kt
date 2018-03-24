@@ -129,17 +129,23 @@ fun substite(expr: Expr, substitutions: Map<String, Expr>): Expr {
             if (substitutions.containsKey(expr.name)) {
                 return substitutions[expr.name]!!
             }
-//            for (i in 0..expr.expr.size) {
-//                expr.expr[i] = substite(expr.expr[i], substitutions)
-//            }
+            for (i in 0..expr.expr.size) {
+                expr.expr[i] = substite(expr.expr[i], substitutions)
+            }
         }
         is UnaryExpr -> {
-            expr.expr = arrayOf(substite(expr.expr.single(), substitutions))
+            expr.expr = mutableListOf(substite(expr.expr.single(), substitutions))
         }
         is BinaryExpr -> {
             expr.l = substite(expr.l, substitutions)
             expr.r = substite(expr.r, substitutions)
         }
+    }
+
+    if (expr is All) {
+        expr.param = (substitutions["x"] as Var)
+    } else if (expr is Exists) {
+        expr.param = (substitutions["x"] as Var)
     }
     return expr
 }
