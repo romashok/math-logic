@@ -4,8 +4,12 @@ import ctd.lebedev.dev.grammar.*
 import java.io.File
 
 fun main(args: Array<String>) {
-    val inputFilePath = "hw4.in"
-    val outputFilePath = "hw4.out"
+//    val inputFilePath = "test7.out"
+//    val inputFilePath = "test11.out"
+    val inputFilePath = "test13.out"
+
+//    val outputFilePath = "hw4.out"
+    val outputFilePath = "test7.res"
     hw4(inputFilePath, outputFilePath)
 }
 
@@ -19,9 +23,6 @@ fun hw4(inputFilePath: String, outputFilePath: String): Boolean {
 
             val firstLine = input.readLine()
             val (strAssumptions, strProve) = firstLine.split("|-")
-//            println(firstLine)
-//            println("ass: $strAssumptions")
-//            println("pro: $strProve")
             if (strAssumptions.trim().isNotEmpty()) {
                 val strLast = strAssumptions.split(",").last()
                 lastAssumption = parser.parseExpr(strLast)
@@ -50,7 +51,6 @@ fun hw4(inputFilePath: String, outputFilePath: String): Boolean {
             var state = -1
             var stateVal: Expr? = null
 
-//            println("${assumptions.single()}|-$statement")
             input.readLines().forEachIndexed proof@{ index, line ->
                 //                println("${assumptions.single()}|-$statement")
 
@@ -140,6 +140,7 @@ fun hw4(inputFilePath: String, outputFilePath: String): Boolean {
                 if (state == -1) {
                     println("Вывод не корректен")
                     output.write("Вывод некорректен, начиная с формулы №$lineIndex: $error\n")
+//                    println(line)
                     return false //hw4
                 } else {
                     approved.add(expr)

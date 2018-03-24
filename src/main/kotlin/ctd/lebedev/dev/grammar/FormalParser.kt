@@ -25,8 +25,10 @@ class FormalParser() {
 
     fun readPredName(): String {
         var j = index
-        if (string[j].isLetter() && string[j].isLowerCase()) return ""
+//        if (string[j].isLetter() && string[j].isLowerCase()) return ""
+        if (!(string[j].isLetter() && string[j].isUpperCase())) return ""
 
+//        while (j < string.length && (string[j].isDigit() || string[j].isLetter() && string[j].isUpperCase())) j++
         while (j < string.length && (string[j].isDigit() || string[j].isLetter() && string[j].isUpperCase())) j++
         val result = string.slice(index until j)
         index = j

@@ -34,6 +34,7 @@ val formalAxiomsExprs: List<Expr> by lazy {
 }
 
 fun match(expr: Expr, axiom: Expr, vars: MutableMap<Expr, Expr>): Boolean {
+//    println("e[${expr::class.java}  a:${axiom::class.java}")
     if (axiom is Var) {
         if (vars.containsKey(axiom)) {
             return vars[axiom]!! == expr
@@ -41,7 +42,7 @@ fun match(expr: Expr, axiom: Expr, vars: MutableMap<Expr, Expr>): Boolean {
             vars.put(axiom, expr)
             return true
         }
-    } else if (expr::class == axiom::class) {
+    } else if (expr::class.java == axiom::class.java) {
         when (axiom) {
             is UnaryExpr -> return match((expr as UnaryExpr).expr.single(), axiom.expr.single(), vars)
             is BinaryExpr -> return match((expr as BinaryExpr).l, axiom.l, vars) && match((expr).r, axiom.r, vars)
@@ -128,13 +129,13 @@ fun freeSubtract(template: Expr, expr: Expr, param: Var, locked: MutableMap<Stri
                 return true
             }
         }
-    } else if (template::class == expr::class) {
+    } else if (template::class.java == expr::class.java) {
         when (template) {
             is All -> {
                 val cnt = locked.getOrDefault(template.param.value, 0)
                 locked.put(template.param.value, cnt + 1)
                 if (expr !is UnaryExpr) {
-//                    println("Real class: ${expr::class}")
+//                    println("Real class: ${expr::class.java}")
                     // todo check type of expr
                     return false
                 }
@@ -147,7 +148,7 @@ fun freeSubtract(template: Expr, expr: Expr, param: Var, locked: MutableMap<Stri
                 val cnt = locked.getOrDefault(template.param.value, 0)
                 locked.put(template.param.value, cnt + 1)
                 if (expr !is UnaryExpr) {
-//                    println("Real class: ${expr::class}")
+//                    println("Real class: ${expr::class.java}")
                     // todo check type of expr
                     return false
                 }
@@ -196,7 +197,7 @@ fun newMatch(template: Expr, expr: Expr, locked: MutableSet<Expr>, dict: Mutable
                 return true
             }
         }
-    } else if (template::class == expr::class) {
+    } else if (template::class.java == expr::class.java) {
         when (template) {
             is All -> {
                 locked.add(template.param)
