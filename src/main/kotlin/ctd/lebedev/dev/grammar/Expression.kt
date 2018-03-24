@@ -4,14 +4,18 @@ sealed class Expr {
     abstract fun eval(vars: MutableMap<String, Boolean>): Boolean
 }
 
-sealed class UnaryExpr(var expr: Expr) : Expr() {
+sealed class UnaryExpr(vararg var expr: Expr) : Expr() {
     override fun equals(other: Any?): Boolean {
-        if (other is UnaryExpr) return expr == other.expr
+        if (other is UnaryExpr) {
+            return expr.size == other.expr.size &&
+                    expr.zip(other.expr).all { (fst, snd) -> fst == snd }
+        }
         return super.equals(other)
     }
 
     override fun hashCode(): Int {
-        return expr.hashCode()
+        val mod = 1e7 + 19
+        return expr.fold(0, { acc, e -> (acc + e.hashCode()) % mod.toInt() })
     }
 }
 
@@ -44,8 +48,8 @@ class And(l: Expr, r: Expr) : BinaryExpr(l, r) {
 }
 
 class Not(expr: Expr) : UnaryExpr(expr) {
-    override fun toString() = "(!$expr)"
-    override fun eval(vars: MutableMap<String, Boolean>) = !expr.eval(vars)
+    override fun toString() = if (expr.size == 1) "(!${expr.single()})" else "(!${expr.contentDeepToString()})"
+    override fun eval(vars: MutableMap<String, Boolean>) = !expr.first().eval(vars)
 }
 
 class Var(var value: String) : Expr() {
@@ -59,4 +63,51 @@ class Var(var value: String) : Expr() {
     override fun hashCode(): Int {
         return value.hashCode()
     }
+}
+
+open class All(var param: Var, expr: Expr) : UnaryExpr(expr) {
+    override fun toString() = "(@$param${expr.joinToString(",")})"
+
+    override fun eval(vars: MutableMap<String, Boolean>) = TODO("eval All")
+}
+
+open class Exists(var param: Var, expr: Expr) : UnaryExpr(expr) {
+    override fun toString() = "(?$param${expr.joinToString(",")})"
+
+
+    override fun eval(vars: MutableMap<String, Boolean>) = TODO("eval Exists")
+}
+
+
+class Pred(var name: String, vararg values: Expr) : UnaryExpr(*values) {
+    override fun toString() = if (expr.isEmpty()) name else "$name(${expr.joinToString(",")})"
+
+    override fun eval(vars: MutableMap<String, Boolean>) = TODO("eval Pred")
+}
+
+
+class Equals(l: Expr, r: Expr) : BinaryExpr(l, r) {
+    override fun toString() = "($l=$r)"
+
+    override fun eval(vars: MutableMap<String, Boolean>) = TODO("eval Equals")
+}
+
+
+class Sum(l: Expr, r: Expr) : BinaryExpr(l, r) {
+    override fun toString() = "($l+$r)"
+
+    override fun eval(vars: MutableMap<String, Boolean>) = TODO("eval Sum")
+}
+
+class Mul(l: Expr, r: Expr) : BinaryExpr(l, r) {
+    override fun toString() = "($l*$r)"
+
+    override fun eval(vars: MutableMap<String, Boolean>) = TODO("eval Mul")
+}
+
+
+class Next(var value: Expr) : Expr() {
+    override fun toString() = "$value'"
+
+    override fun eval(vars: MutableMap<String, Boolean>) = TODO("eval Mul")
 }

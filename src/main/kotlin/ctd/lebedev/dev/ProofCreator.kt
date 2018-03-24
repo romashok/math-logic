@@ -90,8 +90,8 @@ fun makeProof(expr: Expr, proof: ProofCreator): Boolean {
             return false
         }
         is Not -> {
-            val A = makeProof(expr.expr, proof)
-            val sub = mapOf("A" to expr.expr)
+            val A = makeProof(expr.expr.single(), proof)
+            val sub = mapOf("A" to expr.expr.single())
             if (A) addProof(proof.expressions, "$PROOFS_ROOT/From_A_To_!!A.proof", sub)
             return !A
         }
@@ -102,6 +102,7 @@ fun makeProof(expr: Expr, proof: ProofCreator): Boolean {
                 is Or -> "or/"
                 is And -> "and/"
                 is Impl -> "implication/"
+                else -> TODO("unreachable code for simple grammar")
             }
             val suffix = "a_b"
                     .replace("a", if (A) "A" else "nA")
@@ -113,6 +114,7 @@ fun makeProof(expr: Expr, proof: ProofCreator): Boolean {
 
             return proof.expressions.last() == expr
         }
+        else -> TODO("unreachable code for simple grammar")
     }
 }
 
@@ -123,8 +125,16 @@ fun makeExpr(strExpr: String, substitutions: Map<String, Expr>): Expr {
 fun substite(expr: Expr, substitutions: Map<String, Expr>): Expr {
     when (expr) {
         is Var -> return substitutions[expr.value]!!
+        is Pred -> {
+            if (substitutions.containsKey(expr.name)) {
+                return substitutions[expr.name]!!
+            }
+//            for (i in 0..expr.expr.size) {
+//                expr.expr[i] = substite(expr.expr[i], substitutions)
+//            }
+        }
         is UnaryExpr -> {
-            expr.expr = substite(expr.expr, substitutions)
+            expr.expr = arrayOf(substite(expr.expr.single(), substitutions))
         }
         is BinaryExpr -> {
             expr.l = substite(expr.l, substitutions)
